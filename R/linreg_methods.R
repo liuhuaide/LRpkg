@@ -95,3 +95,29 @@ coef.linreg <- function(object, ...) {
   names(object$coefficients) <- colnames(object$fitted_values)
   return(object$coefficients)
 }
+
+
+
+#' Summary Method for linreg Objects
+#'
+#' Provides a summary of the linreg object including coefficients, standard errors,
+#' t-values, and residual statistics.
+#'
+#' @param object An object of class "linreg".
+#' @param ... Additional arguments (not used).
+#'
+#' @return A summary of the linear regression model.
+#' @export
+summary.linreg <- function(object, ...) {
+  cat("Coefficients:\n")
+  coef_df <- data.frame(
+    Estimate = as.vector(object$coefficients),
+    `Std. Error` = sqrt(diag(object$beta_variance)),
+    `t value` = object$t_values,
+    `Pr(>|t|)` = object$p_values
+  )
+  print(coef_df)
+
+  cat("\nResidual standard error:", sqrt(object$residual_variance),
+      "on", object$df, "degrees of freedom\n")
+}
