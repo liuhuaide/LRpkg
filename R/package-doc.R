@@ -29,4 +29,4 @@ NULL
 Fitted <- NULL
 Residuals <- NULL
 Sqrt_Residuals <- NULL
-
+Sqrt_Std_Residuals <- NULL

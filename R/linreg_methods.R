@@ -25,30 +25,32 @@ print.linreg <- function(x, ...) {
 #'
 #' @importFrom ggplot2 ggplot aes geom_point geom_hline labs theme_minimal
 #' @importFrom gridExtra grid.arrange
-#'
+#' @importFrom stats sd
+#' 
 #' @export
 plot.linreg <- function(x, ...) {
-
+  # Residuals vs Fitted plot
   df1 <- data.frame(
     Fitted = x$fitted_values,
     Residuals = x$residuals
   )
   p1 <- ggplot(df1, aes(x = Fitted, y = Residuals)) +
     geom_point(shape = 1) +
+    geom_smooth(se = FALSE, color = "red", method = "lm") + 
     geom_hline(yintercept = 0, linetype = "dashed") +
     labs(title = "Residuals vs Fitted", x = "Fitted Values", y = "Residuals") +
     theme_minimal()
-
+  
+  standardized_residuals <- (x$residuals) / sd(x$residuals)
   df2 <- data.frame(
     Fitted = x$fitted_values,
-    Sqrt_Residuals = sqrt(abs(x$residuals))
+    Sqrt_Std_Residuals = sqrt(abs(standardized_residuals))  # Use sqrt of standardized residuals
   )
-  p2 <- ggplot(df2, aes(x = Fitted, y = Sqrt_Residuals)) +
+  p2 <- ggplot(df2, aes(x = Fitted, y = Sqrt_Std_Residuals)) +
     geom_point(shape = 1) +
-    geom_smooth(se = F , color = "red") +
-    labs(title = "Scale-Location", x = "Fitted Values", y = expression(sqrt(abs(Residuals)))) +
+    geom_smooth(se = FALSE, color = "red", method = "lm") +
+    labs(title = "Scale-Location", x = "Fitted Values", y = expression(sqrt(abs(Standardized~Residuals)))) +
     theme_minimal()
-
   grid.arrange(p1, p2, nrow = 2)
 }
 
