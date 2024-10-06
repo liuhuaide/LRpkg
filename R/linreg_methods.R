@@ -24,33 +24,47 @@ print.linreg <- function(x, ...) {
 #' @param ... Additional arguments (not used).
 #'
 #' @importFrom ggplot2 ggplot aes geom_point geom_hline labs theme_minimal
+#' @importFrom ggplot2 geom_line theme element_blank element_rect element_text
 #' @importFrom gridExtra grid.arrange
-#' @importFrom stats sd
+#' @importFrom stats sd aggregate median
 #' 
 #' @export
 plot.linreg <- function(x, ...) {
-  # Residuals vs Fitted plot
+  
   df1 <- data.frame(
     Fitted = x$fitted_values,
     Residuals = x$residuals
   )
-  p1 <- ggplot(df1, aes(x = Fitted, y = Residuals)) +
+  med_df1 <- aggregate(Residuals ~ Fitted, data = df1, median)
+  p1 <- ggplot(df1, aes(Fitted, Residuals)) +
     geom_point(shape = 1) +
-    geom_smooth(se = FALSE, color = "red", method = "lm") + 
+    geom_line(data = med_df1, aes(Fitted, Residuals), color = "red") +
     geom_hline(yintercept = 0, linetype = "dashed") +
     labs(title = "Residuals vs Fitted", x = "Fitted Values", y = "Residuals") +
-    theme_minimal()
+    theme_minimal() +
+    theme(aspect.ratio = 4/5) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_rect(colour = "black", linewidth = 1)) +
+    theme(plot.title = element_text(hjust = 0.5))
   
   standardized_residuals <- (x$residuals) / sd(x$residuals)
   df2 <- data.frame(
     Fitted = x$fitted_values,
-    Sqrt_Std_Residuals = sqrt(abs(standardized_residuals))  # Use sqrt of standardized residuals
+    Sqrt_Std_Residuals = sqrt(abs(standardized_residuals))
   )
-  p2 <- ggplot(df2, aes(x = Fitted, y = Sqrt_Std_Residuals)) +
+  med_df2 <- aggregate(Sqrt_Std_Residuals ~ Fitted, data = df2, median)
+  p2 <- ggplot(df2, aes(Fitted, Sqrt_Std_Residuals)) +
     geom_point(shape = 1) +
     geom_smooth(se = FALSE, color = "red", method = "lm") +
     labs(title = "Scale-Location", x = "Fitted Values", y = expression(sqrt(abs(Standardized~Residuals)))) +
-    theme_minimal()
+    theme_minimal() +
+    theme(aspect.ratio = 4/5) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_rect(colour = "black", linewidth = 1)) +
+    theme(plot.title = element_text(hjust = 0.5))
+  
   grid.arrange(p1, p2, nrow = 2)
 }
 

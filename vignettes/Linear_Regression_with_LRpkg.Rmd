@@ -24,6 +24,7 @@ First, we load the 'LRpkg' package and use the 'iris' dataset that comes with R:
 
 ```{r setup}
 library(LRpkg)
+library(ggplot2)
 data(iris)
 ```
 
