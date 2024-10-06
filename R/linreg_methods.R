@@ -7,8 +7,12 @@
 #'
 #' @export
 print.linreg <- function(x, ...) {
+  data_name <- deparse(substitute(iris))
+  cat("linreg(formula =", deparse(x$formula), ", data =", data_name, ")\n")
   cat("Coefficients:\n")
-  print(coef(x))
+  coef_matrix <- x$coefficients
+  #names(coef_matrix) <- names(x$coefficients)
+  print(coef_matrix, quote = FALSE)
 }
 
 

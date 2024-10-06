@@ -46,7 +46,9 @@ linreg <- function(formula, data) {
     residual_variance = residual_variance,
     beta_variance = beta_variance,
     t_values = t_values,
-    p_values = p_values
+    p_values = p_values,
+    formula = formula,
+    data = data
   )
   class(LR_result) <- "linreg"
   return(LR_result)
