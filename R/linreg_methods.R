@@ -7,12 +7,12 @@
 #'
 #' @export
 print.linreg <- function(x, ...) {
-  data_name <- deparse(substitute(iris))
-  cat("linreg(formula =", deparse(x$formula), ", data =", data_name, ")\n")
+  formula_str <- paste0("linreg(formula = ", deparse(x$formula), ", data = ", x$data_name, ")")
+  cat(formula_str, "\n\n")
   cat("Coefficients:\n")
-  coef_matrix <- x$coefficients
-  #names(coef_matrix) <- names(x$coefficients)
-  print(coef_matrix, quote = FALSE)
+  coef_vector <- as.vector(x$coefficients)
+  names(coef_vector) <- rownames(x$coefficients)
+  print(coef_vector)
 }
 
 
@@ -114,14 +114,37 @@ coef.linreg <- function(object, ...) {
 #' @export
 summary.linreg <- function(object, ...) {
   cat("Coefficients:\n")
-  coef_df <- data.frame(
-    Estimate = as.vector(object$coefficients),
-    `Std. Error` = sqrt(diag(object$beta_variance)),
-    `t value` = object$t_values,
-    `Pr(>|t|)` = object$p_values
-  )
-  print(coef_df)
+  cat(" ", deparse(object$formula), "\n\n")
 
-  cat("\nResidual standard error:", sqrt(object$residual_variance),
-      "on", object$df, "degrees of freedom\n")
+  Pr <- object$p_values
+  n <- length(Pr)
+  Pr_alpha <- character(n)
+  for (i in 1:n) {
+    if (Pr[i] < 0.001){
+      Pr_alpha[i] <- "***"
+    }else{
+      if(Pr[i] < 0.01){
+        Pr_alpha[i] <- "**"
+      }else{
+        if(Pr[i] < 0.05){
+          Pr_alpha[i] <- "*"
+        }
+      }
+    }
+  }
+
+  cat("Coefficients:\n")
+  result <- data.frame(
+    Estimate = object$coefficients,
+    Std.Error = sqrt(diag(object$beta_variance)),
+    t.value = object$t_values,
+    Pr = Pr_alpha
+  )
+  rownames(result) <- rownames(object$coefficients)
+  print(result)
+
+  residual_std_error <- sqrt(object$residual_variance)
+  df <- object$df
+  cat("\nResidual standard error:", round(residual_std_error, 4), "on", df, "degrees of freedom\n")
+  invisible(result)
 }

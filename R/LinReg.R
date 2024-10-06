@@ -38,6 +38,8 @@ linreg <- function(formula, data) {
   t_values <- as.vector(beta_hat / sqrt(diag(beta_variance)))
   p_values <- 2 * pt(-abs(t_values), df)
 
+  data_name <- deparse(substitute(data))
+
   LR_result <- list(
     coefficients = beta_hat,
     fitted_values = fitted_values,
@@ -48,7 +50,8 @@ linreg <- function(formula, data) {
     t_values = t_values,
     p_values = p_values,
     formula = formula,
-    data = data
+    data = data,
+    data_name = as.name(data_name)
   )
   class(LR_result) <- "linreg"
   return(LR_result)
