@@ -1,0 +1,87 @@
+---
+title: "Linear_Regression_with_LRpkg"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Linear_Regression_with_LRpkg}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+#Introduction
+
+This is a simple tutorial to demonstrate how to use the 'linreg()' function. We will perform linear regression analysis with the 'iris' dataset and show how to use the other methods in the' LRpkg 'package.
+
+#Load packages and data
+
+First, we load the 'LRpkg' package and use the 'iris' dataset that comes with R.
+
+```{r setup}
+library(LRpkg)
+data(iris)
+```
+
+#Executive linear regression
+
+We use 'Sepal.Length' as the dependent variable and 'Sepal.Width' and 'Petal.Length' as the independent variables for regression.
+
+```{r linreg}
+model <- linreg(Sepal.Length ~ Sepal.Width + Petal.Length, data = iris)
+```
+
+#Print model result
+
+The regression coefficient can be printed using the 'print()' method:
+
+```{r print}
+print(model)
+```
+
+#Plot residuals
+
+Check the fit of the model by plotting the residuals using the 'plot()' method.
+
+```{r plot}
+plot(model)
+```
+
+#Acquired residuals
+
+The resid() method can be used to obtain the residual of the model:
+
+```{r resid}
+residuals <- resid(model)
+print(residuals)
+```
+
+#Output predicted value
+
+We can use the 'pred()' method to get the predicted value of the model:
+
+```{r pred}
+predicted_values <- pred(model)
+print(predicted_values)
+```
+
+#Get the regression coefficient
+
+We can use the coef() method to obtain the regression coefficient:
+
+```{r coef}
+coefficients <- coef(model)
+print(coefficients)
+```
+
+#Model summary
+
+We can also use the 'summary()' method to view detailed statistics of the model, including the standard error, t-value, and p-value of the coefficients.
+
+```{r summary}
+summary(model)
+```
