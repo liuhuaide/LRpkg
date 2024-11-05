@@ -80,35 +80,28 @@ print(paste("Linear regression training set RMSE:", lin_train_rmse))
 The ridgereg() function is used to fit the ridge regression model on the training set, experimenting with different λ values.
 
 ```{r Ridge_regression}
+data("BostonHousing", package = "mlbench")
+set.seed(123)
+trainIndex <- createDataPartition(BostonHousing$medv, p = .8, 
+                                  list = FALSE, 
+                                  times = 1)
+trainData <- BostonHousing[trainIndex, ]
+testData  <- BostonHousing[-trainIndex, ]
+
 lambda_values <- seq(0, 10, by = 0.5)
+
 ridge_models <- lapply(lambda_values, function(lambda) {
   ridgereg(medv ~ ., data = trainData, lambda = lambda)
 })
 
-#str(trainData)
-
-trainData <- as.data.frame(lapply(trainData, function(col) {
-  if (is.factor(col) || is.character(col)) {
-    as.numeric(as.character(col))
-  } else {
-    col
-  }
-}))
-
-#str(trainData)
-
-trainData <- na.omit(trainData)
-
-newdata <- trainData[, !colnames(trainData) %in% "medv", drop = FALSE]
-
 ridge_rmse <- sapply(ridge_models, function(model) {
-  preds <- pred(model, newdata = newdata)  
-  RMSE(preds, trainData$medv) 
+  preds <- pred(model, newdata = trainData)
+  RMSE(preds, trainData$medv)
 })
 
 plot(lambda_values, ridge_rmse, type = "b", 
-     xlab = "Lambda", ylab = "Training Set RMSE",
-     main = "Training sets of ridge regression models with different λ values RMSE")
+     xlab = "Lambda", ylab = "training set RMSE",
+     main = "Training set RMSE for ridge regression models with different λ values")
 ```
 
 Select the best λ:
