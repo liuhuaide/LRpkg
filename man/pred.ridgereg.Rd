@@ -2,23 +2,26 @@
 % Please edit documentation in R/ridgereg_methods.R
 \name{pred.ridgereg}
 \alias{pred.ridgereg}
-\title{Predict Fitted Values from Ridge Regression Model}
+\title{pred.ridgereg: Generate predictions from a ridge regression model}
 \usage{
 \method{pred}{ridgereg}(object, newdata = NULL, ...)
 }
 \arguments{
-\item{object}{A ridge regression model object returned by the \code{ridgereg} function.}
+\item{object}{An object of class \code{ridgereg}, which contains the ridge regression model,
+the fitted coefficients, and the original data used to build the model.}
 
-\item{newdata}{A data frame containing the new data for which predictions are to be made.
-If \code{NULL} (default), the original data used to fit the model will be used.}
+\item{newdata}{A data frame containing new observations for the predictors. If provided,
+predictions will be generated for these new observations. If NULL (the default),
+the function will use the original data from \code{object}.}
 
-\item{...}{Additional arguments to be passed to methods.}
+\item{...}{Additional arguments (currently not used).}
 }
 \value{
-A numeric vector of fitted values corresponding to the new data.
+A vector of predicted values. If \code{newdata} is provided, the predictions are based on
+this data. Otherwise, the predictions are based on the original data in \code{object}.
 }
 \description{
-This function predicts the fitted values from a ridge regression model. It can handle new data
-or use the data originally used to fit the model if no new data is provided. The function
-standardizes the predictor variables using the mean and standard deviation from the original data.
+This function generates predictions based on a ridge regression model created with \code{ridgereg}.
+It can either use the original data (if \code{newdata} is not provided) or make predictions
+on a new dataset.
 }
