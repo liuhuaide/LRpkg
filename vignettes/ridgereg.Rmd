@@ -1,0 +1,146 @@
+---
+title: "ridgereg"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ridgereg}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(LRpkg)
+library(caret)
+library(mlbench)
+library(dplyr)
+library(leaps)
+library(elasticnet)
+```
+
+# Introduction
+
+This package demonstrates how to use the custom ridge regression function ridgereg() with the caret package to perform predictive analysis on the BostonHousing dataset. We will construct three models: linear regression, forward selection linear regression, and ridge regression, and compare their performance.
+
+# Dataset partitioning
+
+We used the caret package to split the BostonHousing dataset into a training set and a test set.
+
+```{r dataset}
+data("BostonHousing", package = "mlbench")
+set.seed(123)
+trainIndex <- createDataPartition(BostonHousing$medv, p = .8, 
+                                  list = FALSE, 
+                                  times = 1)
+trainData <- BostonHousing[trainIndex, ]
+testData  <- BostonHousing[-trainIndex, ]
+```
+
+# Model building
+
+Fit a standard linear regression model on the training set:
+
+```{r linear_regression}
+lin_model <- linreg(medv ~ ., data = trainData)
+summary(lin_model)
+```
+
+caret::train is used for forward selection to ensure that the algorithm can select models with 0 to n covariates.
+
+```{r forward_selection}
+library(caret)
+library(leaps)
+ctrl <- trainControl(method = "cv", number = 10)
+max_nvmax <- ncol(trainData) - 1 
+nvmax_values <- seq(1, max_nvmax) 
+step_model <- train(medv ~ ., data = trainData,
+                    method = "leapForward",
+                    trControl = ctrl,
+                    tuneGrid = data.frame(nvmax = nvmax_values))
+print(summary(step_model))
+```
+
+# Model evaluation: linear regression model
+
+Evaluate the performance of a linear regression model on a training set:
+
+```{r evaluation}
+lin_train_preds <- pred(lin_model, newdata = trainData)
+lin_train_rmse <- RMSE(lin_train_preds, trainData$medv)
+print(paste("Linear regression training set RMSE:", lin_train_rmse))
+```
+
+# Ridge regression model
+
+The ridgereg() function is used to fit the ridge regression model on the training set, experimenting with different λ values.
+
+```{r Ridge_regression}
+lambda_values <- seq(0, 10, by = 0.5)
+ridge_models <- lapply(lambda_values, function(lambda) {
+  ridgereg(medv ~ ., data = trainData, lambda = lambda)
+})
+
+#str(trainData)
+
+trainData <- as.data.frame(lapply(trainData, function(col) {
+  if (is.factor(col) || is.character(col)) {
+    as.numeric(as.character(col))
+  } else {
+    col
+  }
+}))
+
+#str(trainData)
+
+trainData <- na.omit(trainData)
+
+newdata <- trainData[, !colnames(trainData) %in% "medv", drop = FALSE]
+
+ridge_rmse <- sapply(ridge_models, function(model) {
+  preds <- pred(model, newdata = newdata)  
+  RMSE(preds, trainData$medv) 
+})
+
+plot(lambda_values, ridge_rmse, type = "b", 
+     xlab = "Lambda", ylab = "Training Set RMSE",
+     main = "Training sets of ridge regression models with different λ values RMSE")
+```
+
+Select the best λ:
+
+```{r best_lambda}
+library(caret)
+library(mlbench)
+data("BostonHousing")
+set.seed(123)
+train_index <- createDataPartition(BostonHousing$medv, p = 0.8, list = FALSE)
+trainData <- BostonHousing[train_index, ]
+testData <- BostonHousing[-train_index, ]
+
+set.seed(123)
+cv_control <- trainControl(method = "cv", number = 10)
+
+ridge_tuning <- train(
+  medv ~ ., 
+  data = trainData, 
+  method = "ridge",  
+  trControl = cv_control,
+  tuneGrid = expand.grid(lambda = seq(0, 10, by = 0.5)),  
+  metric = "RMSE",
+  preProc = c("center", "scale")  
+)
+
+best_lambda <- ridge_tuning$bestTune$lambda
+print(paste("The best λ:", best_lambda))
+
+print(ridge_tuning)
+```
+
+# Conclusion
+
+We show how to use the custom ridgereg() function and the caret package for ridge regression model building and tuning for the BostonHousing dataset. We compare the performance of the three models on the test set, and we can see that ridge regression (optimal λ) alleviates the multicollinearity problem to a certain extent, and improves the generalization ability of the model.
