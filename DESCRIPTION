@@ -14,7 +14,11 @@ Imports:
     ggplot2,
     gridExtra,
     nycflights13,
-    stats
+    stats,
+    caret,
+    dplyr,
+    mlbench,
+    leaps
 Suggests: 
     knitr,
     rmarkdown,
