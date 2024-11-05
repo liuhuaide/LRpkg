@@ -18,7 +18,8 @@ Imports:
     caret,
     dplyr,
     mlbench,
-    leaps
+    leaps,
+    elasticnet
 Suggests: 
     knitr,
     rmarkdown,
