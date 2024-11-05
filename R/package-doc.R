@@ -30,3 +30,5 @@ Fitted <- NULL
 Residuals <- NULL
 Sqrt_Residuals <- NULL
 Sqrt_Std_Residuals <- NULL
+
+utils::globalVariables(c("flights", "arr_delay", "dep_delay", "delay", "dest", "airports", "lon", "lat", "mean_delay", "Fitted", "Residuals", "Sqrt_Residuals", "Sqrt_Std_Residuals"))

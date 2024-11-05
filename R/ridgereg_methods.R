@@ -34,12 +34,3 @@ coef.ridgereg <- function(object, ...) {
   names(object$coefficients) <- colnames(object$fitted_values)
   return(object$coefficients)
 }
-
-
-# 假设 ridge_model 是一个 ridgereg 对象
-#print(ridge_result)             # 打印模型信息
-#fitted_values <- pred(ridge_result)  # 获取拟合值
-#print(fitted_values)   
-#coefficients <- coef(ridge_result)   # 获取回归系数
-#print(coefficients)
-

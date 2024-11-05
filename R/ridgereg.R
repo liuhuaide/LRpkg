@@ -33,54 +33,48 @@ ridgereg <- function(formula, data, lambda) {
     stop("Error: lambda must be a non-negative number.")
   }
   
-  # 提取设计矩阵和响应变量
-  X <- model.matrix(formula, data)  # 包含截距项
+  X <- model.matrix(formula, data)
   y <- data[[all.vars(formula)[1]]]
   
-  # 标准化自变量（不包括截距项）
+  # Standardize the independent variables
   X_intercept <- X[, -1]
-  #X_norm <- scale(X_intercept)  # 标准化自变量
   X_norm <- apply(X_intercept, 2, function(column) {
     (column - mean(column)) / sd(column)
   })
-  X_norm <- cbind(Intercept = 1, X_norm)  # 重新添加截距列
+  X_norm <- cbind(Intercept = 1, X_norm)
   
-  # 构建惩罚矩阵，确保截距项不受惩罚
+  # Construct penalty matrix
   penalty_matrix <- diag(ncol(X_norm))
-  penalty_matrix[1, 1] <- 0  # 不惩罚截距项
+  penalty_matrix[1, 1] <- 0
   
-  # 增广矩阵，将设计矩阵和惩罚矩阵结合
+  # Augmented matrix
   B <- rbind(X_norm, sqrt(lambda) * penalty_matrix)
   b <- c(y, rep(0, ncol(X_norm)))
   
-  # QR 分解
+  # QR decomposition
   qr_decomp <- qr(B)
   Q <- qr.Q(qr_decomp)
   R <- qr.R(qr_decomp)
   
-  # 计算岭回归系数
+  # Calculate ridge regression coefficients
   beta_hat <- solve(R, t(Q) %*% b)
   
-  # 计算拟合值和残差
-  fitted_values <- X %*% beta_hat  # 拟合值包含截距项
+  # Calculate fitted values and residuals
+  fitted_values <- X %*% beta_hat
   residuals <- y - fitted_values
   
   n <- nrow(X)
   p <- ncol(X)
   df <- n - p
   
-  # 残差方差
+  # Residual variance
   residual_variance <- sum(residuals^2) / df
   beta_variance <- as.numeric(residual_variance) * solve(t(R) %*% R + lambda * diag(ncol(R)))
   
-  # 计算t值和p值
+  # Calculate t-values and p-values
   t_values <- as.vector(beta_hat / sqrt(diag(beta_variance)))
   p_values <- 2 * pt(-abs(t_values), df)
   
-  # 计算 GCV（广义交叉验证）
-  gcv <- (n * residual_variance) / (n - p)^2
-  
-  # 创建结果列表
   ridge_result <- list(
     coefficients = beta_hat,
     fitted_values = fitted_values,
@@ -93,8 +87,7 @@ ridgereg <- function(formula, data, lambda) {
     lambda = lambda,
     formula = formula,
     data = data,
-    data_name = deparse(substitute(data)),
-    gcv = gcv  # 添加 GCV 值
+    data_name = deparse(substitute(data))
   )
   
   class(ridge_result) <- "ridgereg"
