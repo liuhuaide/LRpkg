@@ -25,14 +25,16 @@ test_that("print() works", {
 test_that("pred() works", {
   ridge_mod <- ridgereg(Petal.Length ~ Sepal.Width + Sepal.Length, data = iris, lambda = 1)
   
-  expect_equal(round(unname(pred(ridge_mod)[c(1, 5, 7)]), 2), c(9.18, 8.97, 8.50), tolerance = 0.01)
+  pred_values <- pred.ridgereg(ridge_mod)
+  expect_equal(round(unname(pred_values[c(1, 5, 7)]), 2), c(1.86,1.55,1.11), tolerance = 0.01)
 })
+
 
 
 test_that("coef() works", {
   ridge_mod <- ridgereg(Petal.Length ~ Sepal.Width + Sepal.Length, data = iris, lambda = 1)
   
-  expect_equal(round(unname(as.vector(coef(ridge_mod))), 2), c(3.76, -0.58, 1.46), tolerance = 0.01)  # 根据实际系数进行调整
+  expect_equal(round(unname(as.vector(coef(ridge_mod))), 2), c(3.76, -0.58, 1.46), tolerance = 0.01)
 })
 
 

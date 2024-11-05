@@ -2,18 +2,23 @@
 % Please edit documentation in R/ridgereg_methods.R
 \name{pred.ridgereg}
 \alias{pred.ridgereg}
-\title{Prediction Method for ridgereg Class}
+\title{Predict Fitted Values from Ridge Regression Model}
 \usage{
-\method{pred}{ridgereg}(object, ...)
+\method{pred}{ridgereg}(object, newdata = NULL, ...)
 }
 \arguments{
-\item{object}{An object of class "ridgereg".}
+\item{object}{A ridge regression model object returned by the \code{ridgereg} function.}
 
-\item{...}{Additional arguments (not used).}
+\item{newdata}{A data frame containing the new data for which predictions are to be made.
+If \code{NULL} (default), the original data used to fit the model will be used.}
+
+\item{...}{Additional arguments to be passed to methods.}
 }
 \value{
-A numeric vector of fitted values.
+A numeric vector of fitted values corresponding to the new data.
 }
 \description{
-Prediction Method for ridgereg Class
+This function predicts the fitted values from a ridge regression model. It can handle new data
+or use the data originally used to fit the model if no new data is provided. The function
+standardizes the predictor variables using the mean and standard deviation from the original data.
 }
